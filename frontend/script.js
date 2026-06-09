@@ -35,7 +35,7 @@
    During local development:  http://localhost:8000
    After deploying to Render:  https://your-service.onrender.com
 ──────────────────────────────────────────────────────────── */
-const BACKEND_URL = window.BACKEND_URL || "https://devops-agent-visualizer-api.onrender.com";
+const BACKEND_URL = window.BACKEND_URL || "http://localhost:8000";
 
 // Convert http:// → ws://  and  https:// → wss://
 // WebSocket URLs use the ws:// protocol, not http://.
@@ -279,73 +279,79 @@ function appendFeedEntry(stage, message) {
    patterns the LLM will produce.
 ──────────────────────────────────────────────────────────── */
 function renderMarkdown(text) {
-    // Handle unresolved backend placeholders
-  text = text.replace(/%%CODEBLOCK\d+%%/g, (match) => {
-    console.warn("Backend returned placeholder:", match);
-
-    return `
-      <pre><code>
-The backend returned "${match}" instead of actual code.
-
-Fix the backend prompt to return fenced markdown code blocks:
-
-\`\`\`
-your code here
-\`\`\`
-      </code></pre>
-    `;
-  });
-  // Protect code blocks first (replace with placeholders so
-  // we don't accidentally format their contents)
+  // STEP 1 — Pull out fenced code blocks FIRST and replace with
+  // numbered placeholders.  We do this before any other processing
+  // so that nothing inside a code block gets mangled (e.g. _italic_
+  // markers or > characters inside shell snippets).
   const codeBlocks = [];
-  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+  text = text.replace(/```(\w*)\r?\n?([\s\S]*?)```/g, (_, lang, code) => {
     const idx = codeBlocks.length;
-    codeBlocks.push(`<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`);
-    return `%%CODE_BLOCK_${idx}%%`;
+    const safeCode = escapeHtml(code.trim());
+    const langClass = lang ? ` class="language-${lang}"` : "";
+    codeBlocks.push(`<pre><code${langClass}>${safeCode}</code></pre>`);
+    // Use a placeholder that cannot appear in normal prose or HTML
+    return `\x02CODE${idx}\x03`;
   });
 
-  // Inline code
+  // STEP 2 — Inline code  (`backtick`)
   text = text.replace(/`([^`]+)`/g, (_, code) => `<code>${escapeHtml(code)}</code>`);
 
-  // Bold **text** or __text__
-  text = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  text = text.replace(/__(.+?)__/g, "<strong>$1</strong>");
+  // STEP 3 — Bold  **text**  or  __text__
+  text = text.replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>");
+  text = text.replace(/__(.+?)__/gs,      "<strong>$1</strong>");
 
-  // Italic *text* or _text_
-  text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-  text = text.replace(/_([^_]+)_/g, "<em>$1</em>");
+  // STEP 4 — Italic  *text*  or  _text_  (single, not double)
+  text = text.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  text = text.replace(/_([^_\n]+)_/g,   "<em>$1</em>");
 
-  // Headings
-  text = text.replace(/^### (.+)$/gm, "<h3>$1</h3>");
-  text = text.replace(/^## (.+)$/gm, "<h2>$1</h2>");
-  text = text.replace(/^# (.+)$/gm, "<h1>$1</h1>");
+  // STEP 5 — Headings  (must run before paragraph wrapping)
+  text = text.replace(/^#{4,} (.+)$/gm, "<h3>$1</h3>");
+  text = text.replace(/^### (.+)$/gm,   "<h3>$1</h3>");
+  text = text.replace(/^## (.+)$/gm,    "<h2>$1</h2>");
+  text = text.replace(/^# (.+)$/gm,     "<h1>$1</h1>");
 
-  // Blockquotes
+  // STEP 6 — Blockquotes
   text = text.replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>");
 
-  // Unordered lists (lines starting with - or *)
-  text = text.replace(/(^[-*] .+$(\n|$))+/gm, (block) => {
+  // STEP 7 — Unordered lists  (lines starting with -  or  *)
+  text = text.replace(/((?:^[-*] .+\n?)+)/gm, (block) => {
     const items = block.trim().split("\n")
+      .filter(Boolean)
       .map((line) => `<li>${line.replace(/^[-*] /, "")}</li>`)
       .join("");
     return `<ul>${items}</ul>`;
   });
 
-  // Ordered lists
-  text = text.replace(/(^\d+\. .+$(\n|$))+/gm, (block) => {
+  // STEP 8 — Ordered lists  (lines starting with  1.  2.  etc.)
+  text = text.replace(/((?:^\d+\. .+\n?)+)/gm, (block) => {
     const items = block.trim().split("\n")
+      .filter(Boolean)
       .map((line) => `<li>${line.replace(/^\d+\. /, "")}</li>`)
       .join("");
     return `<ol>${items}</ol>`;
   });
 
-  // Paragraphs (double newlines)
-  text = text.replace(/\n\n+/g, "</p><p>");
-  text = `<p>${text}</p>`;
+  // STEP 9 — Paragraphs
+  // Split on blank lines; skip lines that are already block-level HTML.
+  const blockTags = /^<(h[1-6]|ul|ol|li|pre|blockquote|p)/;
+  const parts = text.split(/\n{2,}/);
+  text = parts.map((chunk) => {
+    chunk = chunk.trim();
+    if (!chunk) return "";
+    if (blockTags.test(chunk)) return chunk;          // already wrapped
+    if (/^\x02CODE\d+\x03$/.test(chunk)) return chunk; // placeholder
+    return `<p>${chunk.replace(/\n/g, "<br>")}</p>`;
+  }).join("\n");
 
-  // Restore code blocks
+  // STEP 10 — Restore code blocks.
+  // Use a global regex so ALL occurrences are replaced (plain string
+  // .replace() only fixes the first match — that was the original bug).
   codeBlocks.forEach((block, idx) => {
-    text = text.replace(`%%CODE_BLOCK_${idx}%%`, block);
+    // The placeholder may be wrapped in <p>…</p> from step 9 — strip
+    // the <p> tags around it so the <pre> sits at the block level.
+    const placeholder = `\x02CODE${idx}\x03`;
+    const re = new RegExp(`<p>\\s*${placeholder}\\s*</p>|${placeholder}`, "g");
+    text = text.replace(re, block);
   });
 
   return text;
@@ -453,79 +459,3 @@ document.querySelectorAll(".chip").forEach((chip) => {
    11. INITIALIZATION
 ──────────────────────────────────────────────────────────── */
 setConnectionStatus("disconnected");
-
-
-// ======================================================
-// PREMIUM UX LAYER (ChatGPT / Cursor STYLE IMPROVEMENTS)
-// ======================================================
-
-// typing effect for final response (VERY IMPORTANT FOR PREMIUM FEEL)
-function typeResponse(text, speed = 10) {
-  responsePanel.innerHTML = "";
-
-  const formatted = renderMarkdown(text);
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = formatted;
-
-  const nodes = Array.from(tempDiv.childNodes);
-  let i = 0;
-
-  function typeNext() {
-    if (i < nodes.length) {
-      responsePanel.appendChild(nodes[i].cloneNode(true));
-      i++;
-      responsePanel.scrollTop = responsePanel.scrollHeight;
-      setTimeout(typeNext, speed);
-    }
-  }
-
-  typeNext();
-}
-
-// improved stage animation (feels like AI thinking, not instant switching)
-function smoothStage(stage) {
-  setTimeout(() => {
-    activateStage(stage);
-  }, Math.random() * 400 + 150);
-}
-
-// override original handler (enhanced version)
-const originalHandleAgentEvent = handleAgentEvent;
-
-handleAgentEvent = function(event) {
-  const { stage, message, response, error } = event;
-
-  // simulate "thinking delay" for realism
-  if (stage && stage !== "complete") {
-    setTimeout(() => {
-      appendFeedEntry(stage, message || `${stage} processing...`);
-      smoothStage(stage);
-    }, 150);
-  } else if (stage) {
-    appendFeedEntry(stage, message || "Processing...");
-    activateStage(stage);
-  }
-
-  // FINAL RESPONSE (premium typing effect)
-  if (stage === "complete" && response) {
-
-    // Debug: check what backend actually sends
-    console.log("FINAL RESPONSE:", response);
-
-    setTimeout(() => {
-      typeResponse(response, 8);
-      markAllComplete();
-      setRunning(false);
-    }, 500);
-  }
-
-  // ERROR HANDLING (clean UX)
-  if (stage === "error" || error) {
-    appendFeedEntry("error", error || "System error occurred");
-    setConnectionStatus("error");
-    setRunning(false);
-  }
-};
-
-const VERSION = "v2";
-console.log("UI Version:", VERSION);
