@@ -11,7 +11,7 @@
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=flat&logo=render&logoColor=black)](https://render.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Live Demo]([https://devops-agent-visualizer.vercel.app/]) · [Backend API]([https://your-api.onrender.com](https://devops-agent-visualizer-api.onrender.com)) · [Report Bug](https://github.com/KalpeshPatel06/devops_agent_visualizer/issues)
+[Live Demo](https://devops-agent-visualizer.vercel.app/) · [Backend API](https://devops-agent-visualizer-api.onrender.com) · [Report Bug](https://github.com/KalpeshPatel06/devops_agent_visualizer/issues)
 
 ![DevOps Agent Visualizer Demo](Screenshot.png)
 
