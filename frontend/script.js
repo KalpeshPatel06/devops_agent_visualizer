@@ -437,3 +437,72 @@ document.querySelectorAll(".chip").forEach((chip) => {
    11. INITIALIZATION
 ──────────────────────────────────────────────────────────── */
 setConnectionStatus("disconnected");
+
+
+// ======================================================
+// PREMIUM UX LAYER (ChatGPT / Cursor STYLE IMPROVEMENTS)
+// ======================================================
+
+// typing effect for final response (VERY IMPORTANT FOR PREMIUM FEEL)
+function typeResponse(text, speed = 10) {
+  responsePanel.innerHTML = "";
+
+  const formatted = renderMarkdown(text);
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = formatted;
+
+  const nodes = Array.from(tempDiv.childNodes);
+  let i = 0;
+
+  function typeNext() {
+    if (i < nodes.length) {
+      responsePanel.appendChild(nodes[i].cloneNode(true));
+      i++;
+      responsePanel.scrollTop = responsePanel.scrollHeight;
+      setTimeout(typeNext, speed);
+    }
+  }
+
+  typeNext();
+}
+
+// improved stage animation (feels like AI thinking, not instant switching)
+function smoothStage(stage) {
+  setTimeout(() => {
+    activateStage(stage);
+  }, Math.random() * 400 + 150);
+}
+
+// override original handler (enhanced version)
+const originalHandleAgentEvent = handleAgentEvent;
+
+handleAgentEvent = function(event) {
+  const { stage, message, response, error } = event;
+
+  // simulate "thinking delay" for realism
+  if (stage && stage !== "complete") {
+    setTimeout(() => {
+      appendFeedEntry(stage, message || `${stage} processing...`);
+      smoothStage(stage);
+    }, 150);
+  } else if (stage) {
+    appendFeedEntry(stage, message || "Processing...");
+    activateStage(stage);
+  }
+
+  // FINAL RESPONSE (premium typing effect)
+  if (stage === "complete" && response) {
+    setTimeout(() => {
+      typeResponse(response, 8); // slow type like ChatGPT
+      markAllComplete();
+      setRunning(false);
+    }, 500);
+  }
+
+  // ERROR HANDLING (clean UX)
+  if (stage === "error" || error) {
+    appendFeedEntry("error", error || "System error occurred");
+    setConnectionStatus("error");
+    setRunning(false);
+  }
+};

@@ -518,3 +518,185 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+
+/* =========================================================
+   PREMIUM UI UPGRADE LAYER (ADD-ON)
+   Makes UI feel like "AI Operator Console"
+========================================================= */
+
+/* subtle animated background grid (very important for premium feel) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ensure content above grid */
+.site-header,
+.main-layout {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   CARD HOVER DEPTH
+========================= */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(31, 111, 235, 0.35);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.6),
+    0 0 25px rgba(31, 111, 235, 0.08);
+}
+
+/* =========================
+   SEND BUTTON "AI POWERED" GLOW
+========================= */
+.send-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+/* animated scan line effect */
+.send-btn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -30%;
+  width: 20px;
+  height: 200%;
+  background: rgba(255,255,255,0.15);
+  transform: rotate(25deg);
+  animation: scan 3s infinite;
+}
+
+@keyframes scan {
+  0% { left: -30%; }
+  100% { left: 130%; }
+}
+
+/* =========================
+   CHIP INTERACTION UPGRADE
+========================= */
+.chip:hover {
+  transform: translateY(-1px);
+  background: rgba(31,111,235,0.08);
+}
+
+/* =========================
+   TIMELINE ENHANCEMENT (FLOW FEEL)
+========================= */
+
+/* vertical glowing connector line */
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(31,111,235,0.2),
+    rgba(63,185,80,0.2)
+  );
+}
+
+/* moving active glow dot */
+.timeline-step.active::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 18px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #1f6feb;
+  box-shadow: 0 0 15px rgba(31,111,235,0.6);
+  animation: floatDot 1.2s infinite;
+}
+
+@keyframes floatDot {
+  0% { transform: translateY(0); opacity: 0.8; }
+  50% { transform: translateY(6px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.8; }
+}
+
+/* =========================
+   FEED "TERMINAL MODE"
+========================= */
+.activity-feed {
+  background:
+    radial-gradient(circle at top left, rgba(31,111,235,0.06), transparent 60%),
+    #0b0f19;
+}
+
+/* blinking cursor effect for new logs */
+.feed-entry:last-child .feed-message::after {
+  content: "▍";
+  animation: blink 1s infinite;
+  margin-left: 4px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* =========================
+   RESPONSE PANEL "AI CONSOLE"
+========================= */
+.response-panel {
+  position: relative;
+}
+
+/* subtle top glow like active terminal */
+.response-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(31,111,235,0.6),
+    transparent
+  );
+}
+
+/* =========================
+   BADGE LIVE PULSE IMPROVED
+========================= */
+.badge-dot {
+  position: relative;
+}
+
+.badge-dot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(31,111,235,0.3);
+  animation: pulseRing 2s infinite;
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(0.7); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
