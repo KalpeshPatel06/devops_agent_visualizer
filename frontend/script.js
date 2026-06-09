@@ -279,6 +279,22 @@ function appendFeedEntry(stage, message) {
    patterns the LLM will produce.
 ──────────────────────────────────────────────────────────── */
 function renderMarkdown(text) {
+    // Handle unresolved backend placeholders
+  text = text.replace(/%%CODEBLOCK\d+%%/g, (match) => {
+    console.warn("Backend returned placeholder:", match);
+
+    return `
+      <pre><code>
+The backend returned "${match}" instead of actual code.
+
+Fix the backend prompt to return fenced markdown code blocks:
+
+\`\`\`
+your code here
+\`\`\`
+      </code></pre>
+    `;
+  });
   // Protect code blocks first (replace with placeholders so
   // we don't accidentally format their contents)
   const codeBlocks = [];
@@ -492,8 +508,12 @@ handleAgentEvent = function(event) {
 
   // FINAL RESPONSE (premium typing effect)
   if (stage === "complete" && response) {
+
+    // Debug: check what backend actually sends
+    console.log("FINAL RESPONSE:", response);
+
     setTimeout(() => {
-      typeResponse(response, 8); // slow type like ChatGPT
+      typeResponse(response, 8);
       markAllComplete();
       setRunning(false);
     }, 500);
