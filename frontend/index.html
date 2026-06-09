@@ -68,16 +68,13 @@
         </button>
       </div>
 
-      <!-- AGENT ACTIVITY FEED
-           Every WebSocket message from the backend is appended here
-           so the user can watch the agent's internal monologue in real time. -->
-      <div class="card feed-card">
-        <div class="card-header">
-          <span class="card-label">Agent Activity Feed</span>
-          <button id="clear-feed-btn" class="ghost-btn">Clear</button>
-        </div>
-        <div id="activity-feed" class="activity-feed">
-          <p class="feed-empty">Agent output will appear here once you submit a prompt.</p>
+      <!-- FINAL RESPONSE PANEL
+           The full AI answer is rendered here once the agent finishes.
+           Markdown-ish formatting (bold, code blocks) is handled in JS. -->
+      <div class="card response-card">
+        <span class="card-label">Final Response</span>
+        <div id="response-panel" class="response-panel">
+          <p class="response-empty">The agent's complete answer will appear here.</p>
         </div>
       </div>
 
@@ -145,13 +142,16 @@
         </ol>
       </div>
 
-      <!-- FINAL RESPONSE PANEL
-           The full AI answer is rendered here once the agent finishes.
-           Markdown-ish formatting (bold, code blocks) is handled in JS. -->
-      <div class="card response-card">
-        <span class="card-label">Final Response</span>
-        <div id="response-panel" class="response-panel">
-          <p class="response-empty">The agent's complete answer will appear here.</p>
+      <!-- AGENT ACTIVITY FEED
+           Every WebSocket message from the backend is appended here
+           so the user can watch the agent's internal monologue in real time. -->
+      <div class="card feed-card">
+        <div class="card-header">
+          <span class="card-label">Agent Activity Feed</span>
+          <button id="clear-feed-btn" class="ghost-btn">Clear</button>
+        </div>
+        <div id="activity-feed" class="activity-feed">
+          <p class="feed-empty">Agent output will appear here once you submit a prompt.</p>
         </div>
       </div>
 
