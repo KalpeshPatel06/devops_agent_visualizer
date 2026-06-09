@@ -1,0 +1,40 @@
+# render.yaml — Render deployment configuration
+# ------------------------------------------------
+# This file tells Render how to build and run the backend.
+# Commit it to your GitHub repository.
+# When you connect the repo in Render's dashboard, this file
+# is automatically detected and used.
+#
+# Docs: https://render.com/docs/render-yaml-reference
+
+services:
+  - type: web
+    name: devops-agent-visualizer-api
+    runtime: python
+    region: oregon
+
+    # Where in the repo the backend code lives
+    rootDir: backend
+
+    # Install dependencies
+    buildCommand: pip install -r requirements.txt
+
+    # Start the FastAPI server
+    # $PORT is set automatically by Render
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    # Environment variables
+    # Add GROQ_API_KEY in the Render dashboard (Environment tab)
+    # Never commit real API keys to source control
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false  # Must be set manually in the Render dashboard
+
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile  # Change if needed
+
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+    # Auto-deploy when you push to the main branch
+    autoDeploy: true

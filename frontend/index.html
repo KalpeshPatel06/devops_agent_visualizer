@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevOps Agent Visualizer</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: JetBrains Mono for code feel, Inter for body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+       Shows the project title and a short description of what
+       this application does.
+  ============================================================ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="brand-icon">⬡</span>
+        <div>
+          <h1 class="brand-title">DevOps Agent Visualizer</h1>
+          <p class="brand-subtitle">Watch an AI agent think, plan, and respond — step by step</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        <span id="connection-status">Connecting…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN LAYOUT
+       Two-column layout:
+         Left  — prompt input + agent activity feed
+         Right — execution timeline + final response
+  ============================================================ -->
+  <main class="main-layout">
+
+    <!-- ── LEFT COLUMN ───────────────────────────────────────── -->
+    <section class="col-left">
+
+      <!-- PROMPT INPUT AREA -->
+      <div class="card prompt-card">
+        <label class="card-label" for="prompt-input">Ask the DevOps Agent</label>
+        <textarea
+          id="prompt-input"
+          class="prompt-textarea"
+          rows="4"
+          placeholder="Try: Explain Kubernetes Pods&#10;      Generate a Dockerfile for a Flask app&#10;      Create a GitHub Actions workflow&#10;      Troubleshoot Kubernetes CrashLoopBackOff"
+        ></textarea>
+
+        <!-- Example chips for quick fill -->
+        <div class="chip-row">
+          <button class="chip" data-text="Explain Kubernetes Pods">Kubernetes Pods</button>
+          <button class="chip" data-text="Generate a Dockerfile for a Flask app">Dockerfile Flask</button>
+          <button class="chip" data-text="Create a GitHub Actions CI/CD workflow">GitHub Actions</button>
+          <button class="chip" data-text="Explain Docker networking">Docker Networking</button>
+          <button class="chip" data-text="Generate Terraform code for an AWS EC2 instance">Terraform EC2</button>
+        </div>
+
+        <button id="send-btn" class="send-btn">
+          <span id="send-btn-label">Run Agent</span>
+          <span id="send-btn-spinner" class="btn-spinner hidden"></span>
+        </button>
+      </div>
+
+      <!-- AGENT ACTIVITY FEED
+           Every WebSocket message from the backend is appended here
+           so the user can watch the agent's internal monologue in real time. -->
+      <div class="card feed-card">
+        <div class="card-header">
+          <span class="card-label">Agent Activity Feed</span>
+          <button id="clear-feed-btn" class="ghost-btn">Clear</button>
+        </div>
+        <div id="activity-feed" class="activity-feed">
+          <p class="feed-empty">Agent output will appear here once you submit a prompt.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── RIGHT COLUMN ──────────────────────────────────────── -->
+    <section class="col-right">
+
+      <!-- EXECUTION TIMELINE
+           Shows the 5 stages of the agent. Each stage lights up
+           as the backend sends the corresponding event. -->
+      <div class="card timeline-card">
+        <span class="card-label">Execution Timeline</span>
+        <ol class="timeline">
+          <li class="timeline-step" id="stage-understand" data-stage="understand">
+            <div class="step-icon">
+              <span class="step-number">1</span>
+              <span class="step-check">✓</span>
+            </div>
+            <div class="step-body">
+              <strong class="step-title">Understand</strong>
+              <p class="step-desc">Parse and analyze the prompt</p>
+            </div>
+          </li>
+          <li class="timeline-step" id="stage-plan" data-stage="plan">
+            <div class="step-icon">
+              <span class="step-number">2</span>
+              <span class="step-check">✓</span>
+            </div>
+            <div class="step-body">
+              <strong class="step-title">Plan</strong>
+              <p class="step-desc">Generate a step-by-step execution plan</p>
+            </div>
+          </li>
+          <li class="timeline-step" id="stage-execute" data-stage="execute">
+            <div class="step-icon">
+              <span class="step-number">3</span>
+              <span class="step-check">✓</span>
+            </div>
+            <div class="step-body">
+              <strong class="step-title">Execute</strong>
+              <p class="step-desc">Work through each plan step</p>
+            </div>
+          </li>
+          <li class="timeline-step" id="stage-respond" data-stage="respond">
+            <div class="step-icon">
+              <span class="step-number">4</span>
+              <span class="step-check">✓</span>
+            </div>
+            <div class="step-body">
+              <strong class="step-title">Respond</strong>
+              <p class="step-desc">Compose the final answer</p>
+            </div>
+          </li>
+          <li class="timeline-step" id="stage-complete" data-stage="complete">
+            <div class="step-icon">
+              <span class="step-number">5</span>
+              <span class="step-check">✓</span>
+            </div>
+            <div class="step-body">
+              <strong class="step-title">Complete</strong>
+              <p class="step-desc">Task finished</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <!-- FINAL RESPONSE PANEL
+           The full AI answer is rendered here once the agent finishes.
+           Markdown-ish formatting (bold, code blocks) is handled in JS. -->
+      <div class="card response-card">
+        <span class="card-label">Final Response</span>
+        <div id="response-panel" class="response-panel">
+          <p class="response-empty">The agent's complete answer will appear here.</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# DevOps Agent Visualizer — Backend Dependencies
+# Install with: pip install -r requirements.txt
+
+# FastAPI — the web framework
+fastapi==0.115.6
+
+# Uvicorn — the ASGI server that runs FastAPI
+# "standard" extras include websockets and http tools
+uvicorn[standard]==0.34.0
+
+# Groq Python SDK — communicates with the Groq LLM API
+groq==0.13.1
+
+# python-dotenv — loads .env file into environment variables
+python-dotenv==1.0.1
+
+# Pydantic — data validation (included with FastAPI but pinned for clarity)
+pydantic==2.10.4
