@@ -11,7 +11,7 @@
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=flat&logo=render&logoColor=black)](https://render.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Live Demo](https://your-app.vercel.app) · [Backend API](https://your-api.onrender.com) · [Report Bug](https://github.com/YOUR_USERNAME/devops-agent-visualizer/issues)
+[Live Demo]([https://your-app.vercel.app](https://devops-agent-visualizer.vercel.app/)) · [Backend API]([https://your-api.onrender.com](https://devops-agent-visualizer-api.onrender.com)) · [Report Bug](https://github.com/KalpeshPatel06/devops-agent-visualizer/issues)
 
 ![DevOps Agent Visualizer Demo](https://via.placeholder.com/900x500/0d1117/1f6feb?text=DevOps+Agent+Visualizer+—+add+your+screenshot+here)
 
@@ -64,25 +64,25 @@ Each stage lights up in real time as the agent works through it. You see the exe
 ┌──────────────────────────────────────────────────────────────┐
 │  Browser — Vercel                                            │
 │                                                              │
-│  index.html + style.css + script.js                         │
+│  index.html + style.css + script.js                          │
 │        │                                                     │
 │        │  1. POST /ask → returns session_id                  │
 │        │  2. WebSocket /ws/{session_id}                      │
-│        │     ← stage events stream in real time             │
+│        │     ← stage events stream in real time              │
 │        ▼                                                     │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │  FastAPI — Render                                   │    │
-│  │                                                     │    │
-│  │   main.py  ──►  agent.py                           │    │
-│  │                  ├── understand()                   │    │
-│  │                  ├── plan()  ──► groq_client.py    │    │
-│  │                  ├── execute()                      │    │
-│  │                  ├── respond() ──► groq_client.py  │    │
-│  │                  └── finish()                       │    │
-│  │                        │                            │    │
-│  │                   Groq API                          │    │
-│  │               (llama-3.3-70b-versatile)             │    │
-│  └─────────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │  FastAPI — Render                                   │     │
+│  │                                                     │     │
+│  │   main.py  ──►  agent.py                            │     │
+│  │                  ├── understand()                   │     │
+│  │                  ├── plan()  ──► groq_client.py     │     │
+│  │                  ├── execute()                      │     │
+│  │                  ├── respond() ──► groq_client.py   │     │
+│  │                  └── finish()                       │     │
+│  │                        │                            │     │
+│  │                   Groq API                          │     │
+│  │               (llama-3.3-70b-versatile)             │     │
+│  └─────────────────────────────────────────────────────┘     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -143,7 +143,7 @@ devops-agent-visualizer/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/devops-agent-visualizer.git
+git clone https://github.com/KalpeshPatel06/devops-agent-visualizer.git
 cd devops-agent-visualizer
 ```
 
