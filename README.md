@@ -13,7 +13,7 @@
 
 [Live Demo]([https://your-app.vercel.app](https://devops-agent-visualizer.vercel.app/)) · [Backend API]([https://your-api.onrender.com](https://devops-agent-visualizer-api.onrender.com)) · [Report Bug](https://github.com/KalpeshPatel06/devops_agent_visualizer/issues)
 
-![DevOps Agent Visualizer Demo](https://via.placeholder.com/900x500/0d1117/1f6feb?text=DevOps+Agent+Visualizer+—+add+your+screenshot+here)
+![DevOps Agent Visualizer Demo](Screenshot.png)
 
 </div>
 
