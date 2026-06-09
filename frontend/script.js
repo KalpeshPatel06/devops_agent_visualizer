@@ -506,3 +506,6 @@ handleAgentEvent = function(event) {
     setRunning(false);
   }
 };
+
+const VERSION = "v2";
+console.log("UI Version:", VERSION);
