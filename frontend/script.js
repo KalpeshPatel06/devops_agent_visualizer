@@ -35,7 +35,7 @@
    During local development:  http://localhost:8000
    After deploying to Render:  https://your-service.onrender.com
 ──────────────────────────────────────────────────────────── */
-const BACKEND_URL = window.BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = window.BACKEND_URL || "https://devops-agent-visualizer-api.onrender.com";
 
 // Convert http:// → ws://  and  https:// → wss://
 // WebSocket URLs use the ws:// protocol, not http://.
