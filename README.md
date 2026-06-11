@@ -87,6 +87,10 @@ Each stage lights up in real time as the agent works through it. You see the exe
 ```
 
 ---
+## System Design
+
+![System Design](system-design.drawio.png)
+---
 
 ## How the Agent Works
 
